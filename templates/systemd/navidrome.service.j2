@@ -1,0 +1,53 @@
+#jinja2: lstrip_blocks: "True"
+[Unit]
+Description=Navidrome ({{ navidrome_identifier }})
+{% for service in navidrome_systemd_required_services_list %}
+Requires={{ service }}
+After={{ service }}
+{% endfor %}
+DefaultDependencies=no
+
+[Service]
+Type=simple
+Environment="HOME={{ devture_systemd_docker_base_systemd_unit_home_path }}"
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} kill {{ navidrome_identifier }} 2>/dev/null || true'
+ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ navidrome_identifier }} 2>/dev/null || true'
+
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
+			--rm \
+			--name={{ navidrome_identifier }} \
+			--log-driver=none \
+			--user={{ navidrome_uid }}:{{ navidrome_gid }} \
+			--cap-drop=ALL \
+			--read-only \
+			--network={{ navidrome_container_network }} \
+			{% if navidrome_container_http_bind_port %}
+			-p {{ navidrome_container_http_bind_port }}:4533 \
+			{% endif %}
+			--env-file={{ navidrome_base_path }}/env \
+			--label-file={{ navidrome_base_path }}/labels \
+			--health-interval={{ navidrome_container_health_interval }} \
+			--mount type=bind,src={{ navidrome_data_path }},dst=/data \
+			{% for volume in navidrome_container_additional_volumes %}
+			--mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+			{% endfor %}
+			{% for arg in navidrome_container_extra_arguments %}
+			{{ arg }} \
+			{% endfor %}
+			{{ navidrome_container_image }}
+
+{% for network in navidrome_container_additional_networks %}
+ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ navidrome_identifier }}
+{% endfor %}
+
+ExecStart={{ devture_systemd_docker_base_host_command_docker }} start --attach {{ navidrome_identifier }}
+
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} kill {{ navidrome_identifier }} 2>/dev/null || true'
+ExecStop=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_systemd_docker_base_host_command_docker }} rm {{ navidrome_identifier }} 2>/dev/null || true'
+
+Restart=always
+RestartSec=30
+SyslogIdentifier={{ navidrome_identifier }}
+
+[Install]
+WantedBy=multi-user.target

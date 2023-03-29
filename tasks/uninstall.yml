@@ -1,0 +1,25 @@
+---
+
+- name: Check existence of Navidrome systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ navidrome_identifier }}.service"
+  register: navidrome_service_stat
+
+- when: navidrome_service_stat.stat.exists | bool
+  block:
+    - name: Ensure Navidrome systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ navidrome_identifier }}"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure Navidrome systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ navidrome_identifier }}.service"
+        state: absent
+
+    - name: Ensure Navidrome path doesn't exist
+      ansible.builtin.file:
+        path: "{{ navidrome_base_path }}"
+        state: absent

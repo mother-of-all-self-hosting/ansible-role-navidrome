@@ -1,0 +1,52 @@
+{% if navidrome_container_labels_traefik_enabled %}
+traefik.enable=true
+
+{% if navidrome_container_labels_traefik_docker_network %}
+traefik.docker.network={{ navidrome_container_labels_traefik_docker_network }}
+{% endif %}
+
+{% set middlewares = [] %}
+
+{% if navidrome_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ navidrome_identifier }}-slashless-redirect.redirectregex.regex=({{ navidrome_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ navidrome_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [navidrome_identifier + '-slashless-redirect'] %}
+{% endif %}
+
+{#
+	Intentionally not adding a stripPrefix middleware.
+	Navidrome seems to serve itself under the same prefix it sees in the ND_BASEURL environment variable.
+#}
+
+{% if navidrome_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
+{% for name, value in navidrome_container_labels_traefik_additional_request_headers.items() %}
+traefik.http.middlewares.{{ navidrome_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [navidrome_identifier + '-add-request-headers'] %}
+{% endif %}
+
+{% if navidrome_container_labels_traefik_additional_response_headers.keys() | length > 0 %}
+{% for name, value in navidrome_container_labels_traefik_additional_response_headers.items() %}
+traefik.http.middlewares.{{ navidrome_identifier }}-add-response-headers.headers.customresponseheaders.{{ name }}={{ value }}
+{% endfor %}
+{% set middlewares = middlewares + [navidrome_identifier + '-add-response-headers'] %}
+{% endif %}
+
+traefik.http.routers.{{ navidrome_identifier }}.rule={{ navidrome_container_labels_traefik_rule }}
+{% if navidrome_container_labels_traefik_priority | int > 0 %}
+traefik.http.routers.{{ navidrome_identifier }}.priority={{ navidrome_container_labels_traefik_priority }}
+{% endif %}
+traefik.http.routers.{{ navidrome_identifier }}.service={{ navidrome_identifier }}
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ navidrome_identifier }}.middlewares={{ middlewares | join(',') }}
+{% endif %}
+traefik.http.routers.{{ navidrome_identifier }}.entrypoints={{ navidrome_container_labels_traefik_entrypoints }}
+traefik.http.routers.{{ navidrome_identifier }}.tls={{ navidrome_container_labels_traefik_tls | to_json }}
+{% if navidrome_container_labels_traefik_tls %}
+traefik.http.routers.{{ navidrome_identifier }}.tls.certResolver={{ navidrome_container_labels_traefik_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ navidrome_identifier }}.loadbalancer.server.port=4533
+{% endif %}
+
+{{ navidrome_container_labels_additional_labels }}

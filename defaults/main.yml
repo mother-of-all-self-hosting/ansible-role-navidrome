@@ -1,0 +1,194 @@
+---
+
+# Project source code URL: https://github.com/navidrome/navidrome
+
+navidrome_enabled: true
+
+navidrome_identifier: navidrome
+
+navidrome_uid: ''
+navidrome_gid: ''
+
+navidrome_version: 0.49.3
+
+navidrome_scheme: https
+
+# The hostname at which navidrome is served.
+navidrome_hostname: ''
+
+# The path at which navidrome is served.
+# This value must either be `/` or not end with a slash (e.g. `/navidrome`).
+navidrome_path_prefix: /
+
+navidrome_base_path: "/{{ navidrome_identifier }}"
+navidrome_data_path: "{{ navidrome_base_path }}/data"
+
+navidrome_container_image: "{{ navidrome_container_image_registry_prefix }}deluan/navidrome:{{ navidrome_container_image_tag }}"
+navidrome_container_image_registry_prefix: docker.io/
+navidrome_container_image_tag: "{{ navidrome_version }}"
+navidrome_container_image_force_pull: "{{ navidrome_container_image.endswith(':latest') }}"
+
+# The base container network. It will be auto-created by this role if it doesn't exist already.
+navidrome_container_network: "{{ navidrome_identifier }}"
+
+# A list of additional container networks that the container would be connected to.
+# The role does not create these networks, so make sure they already exist.
+# Use this to expose this container to another reverse proxy, which runs in a different container network.
+navidrome_container_additional_networks: "{{ navidrome_container_additional_networks_auto + navidrome_container_additional_networks_custom }}"
+navidrome_container_additional_networks_auto: []
+navidrome_container_additional_networks_custom: []
+
+# Specifies how the container publishes its HTTP port
+#
+# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:4533"), just a port number or an empty string to not expose.
+navidrome_container_http_bind_port: ''
+
+# navidrome_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
+# See `../templates/labels.j2` for details.
+#
+# To inject your own other container labels, see `navidrome_container_labels_additional_labels`.
+navidrome_container_labels_traefik_enabled: true
+navidrome_container_labels_traefik_docker_network: "{{ navidrome_container_network }}"
+navidrome_container_labels_traefik_hostname: "{{ navidrome_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/navidrome`).
+navidrome_container_labels_traefik_path_prefix: "{{ navidrome_path_prefix }}"
+navidrome_container_labels_traefik_rule: "Host(`{{ navidrome_container_labels_traefik_hostname }}`){% if navidrome_container_labels_traefik_path_prefix != '/' %} && PathPrefix(`{{ navidrome_container_labels_traefik_path_prefix }}`){% endif %}"
+navidrome_container_labels_traefik_priority: 0
+navidrome_container_labels_traefik_entrypoints: web-secure
+navidrome_container_labels_traefik_tls: "{{ navidrome_container_labels_traefik_entrypoints != 'web' }}"
+navidrome_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+# Controls which additional headers to attach to all HTTP requests.
+# To add your own custom request headers, use `navidrome_container_labels_traefik_additional_response_headers_custom`
+navidrome_container_labels_traefik_additional_request_headers: "{{ navidrome_container_labels_traefik_additional_request_headers_auto | combine(navidrome_container_labels_traefik_additional_request_headers_custom) }}"
+navidrome_container_labels_traefik_additional_request_headers_auto: {}
+navidrome_container_labels_traefik_additional_request_headers_custom: {}
+
+# Controls which additional headers to attach to all HTTP responses.
+# To add your own custom response headers, use `navidrome_container_labels_traefik_additional_response_headers_custom`
+navidrome_container_labels_traefik_additional_response_headers: "{{ navidrome_container_labels_traefik_additional_response_headers_auto | combine(navidrome_container_labels_traefik_additional_response_headers_custom) }}"
+navidrome_container_labels_traefik_additional_response_headers_auto: |
+  {{
+    {}
+    | combine ({'X-XSS-Protection': navidrome_http_header_xss_protection} if navidrome_http_header_xss_protection else {})
+    | combine ({'X-Frame-Options': navidrome_http_header_frame_options} if navidrome_http_header_frame_options else {})
+    | combine ({'X-Content-Type-Options': navidrome_http_header_content_type_options} if navidrome_http_header_content_type_options else {})
+    | combine ({'Content-Security-Policy': navidrome_http_header_content_security_policy} if navidrome_http_header_content_security_policy else {})
+    | combine ({'Permission-Policy': navidrome_http_header_content_permission_policy} if navidrome_http_header_content_permission_policy else {})
+    | combine ({'Strict-Transport-Security': navidrome_http_header_strict_transport_security} if navidrome_http_header_strict_transport_security and navidrome_container_labels_traefik_tls else {})
+  }}
+navidrome_container_labels_traefik_additional_response_headers_custom: {}
+
+# navidrome_container_labels_additional_labels contains a multiline string with additional labels to add to the container label file.
+# See `../templates/labels.j2` for details.
+#
+# Example:
+# navidrome_container_labels_additional_labels: |
+#   my.label=1
+#   another.label="here"
+navidrome_container_labels_additional_labels: ''
+
+# Specifies how often the container health-check will run.
+#
+# For Traefik based setups, it's important that the interval is short,
+# because the interval value also specifies the "initial wait time".
+# This is a Docker (moby) bug: https://github.com/moby/moby/issues/33410
+# Without a successful healthcheck, Traefik will not register the service for reverse-proxying.
+# Thus, the health interval determines the initial start-up time -- the smaller, the better.
+#
+# For non-Traefik setups, we use the default healthcheck interval (30s) to decrease overhead.
+navidrome_container_health_interval: "{{ '5s' if navidrome_container_labels_traefik_enabled else '30s' }}"
+
+# A list of additional "volumes" to mount in the container.
+#
+# See the `--mount` documentation for the `docker run` command.
+#
+# Example:
+# navidrome_container_additional_volumes:
+#   - type: bind
+#     src: /path/on/the/host
+#     dst: /data
+#   - type: bind
+#     src: /another-path/on/the/host
+#     dst: /read-only
+#     options: readonly
+navidrome_container_additional_volumes: []
+
+# A list of extra arguments to pass to the container
+navidrome_container_extra_arguments: []
+
+# Controls the `ND_SCANSCHEDULE` environment variable
+navidrome_environment_variable_nd_scanschedule: 24h
+
+# Controls the `ND_SESSIONTIMEOUT` environment variable
+navidrome_environment_variable_nd_sessiontimeout: 24h
+
+# Controls the `ND_LOGLEVEL` environment variable.
+# Valid values are: error, warn, info, debug, trace
+navidrome_environment_variable_nd_loglevel: info
+
+# Controls the `ND_BASEURL` environment variable
+navidrome_environment_variable_nd_baseurl: "{{ '' if navidrome_path_prefix == '/' else navidrome_path_prefix }}"
+
+# Controls the `ND_MUSICFOLDER` environment variable
+navidrome_environment_variable_nd_musicfolder: /music
+
+# Additional environment variables.
+navidrome_environment_variables_additional_variables: ''
+
+# Specifies the value of the `X-XSS-Protection` header
+# Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
+#
+# Learn more about it is here:
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+# - https://portswigger.net/web-security/cross-site-scripting/reflected
+navidrome_http_header_xss_protection: "1; mode=block"
+
+# Specifies the value of the `X-Frame-Options` header which controls whether framing can happen.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+navidrome_http_header_frame_options: SAMEORIGIN
+
+# Specifies the value of the `X-Content-Type-Options` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+navidrome_http_header_content_type_options: nosniff
+
+# Specifies the value of the `Content-Security-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+navidrome_http_header_content_security_policy: frame-ancestors 'self'
+
+# Specifies the value of the `Permission-Policy` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permission-Policy
+navidrome_http_header_content_permission_policy: "{{ 'interest-cohort=()' if navidrome_floc_optout_enabled else '' }}"
+
+# Specifies the value of the `Strict-Transport-Security` header.
+# See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+navidrome_http_header_strict_transport_security: "max-age=31536000; includeSubDomains{{ '; preload' if navidrome_hsts_preload_enabled else '' }}"
+
+# Controls whether to send a "Permissions-Policy interest-cohort=();" header along with all responses
+#
+# Learn more about what it is here:
+# - https://www.eff.org/deeplinks/2021/03/googles-floc-terrible-idea
+# - https://paramdeo.com/blog/opting-your-website-out-of-googles-floc-network
+# - https://amifloced.org/
+#
+# Of course, a better solution is to just stop using browsers (like Chrome), which participate in such tracking practices.
+# See: `navidrome_content_permission_policy`
+navidrome_floc_optout_enabled: true
+
+# Controls if HSTS preloading is enabled
+#
+# In its strongest and recommended form, the [HSTS policy](https://www.chromium.org/hsts) includes all subdomains, and
+# indicates a willingness to be "preloaded" into browsers:
+# `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+# For more information visit:
+# - https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
+# - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+# - https://hstspreload.org/#opt-in
+# See: `navidrome_http_header_strict_transport_security`
+navidrome_hsts_preload_enabled: false
+
+# List of systemd services that navidrome.service depends on
+navidrome_systemd_required_services_list: "{{ navidrome_systemd_required_systemd_services_list_default + navidrome_systemd_required_systemd_services_list_auto + navidrome_systemd_required_systemd_services_list_custom }}"
+navidrome_systemd_required_systemd_services_list_default: ['docker.service']
+navidrome_systemd_required_systemd_services_list_auto: []
+navidrome_systemd_required_systemd_services_list_custom: []

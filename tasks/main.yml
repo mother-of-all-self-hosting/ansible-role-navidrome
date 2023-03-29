@@ -1,0 +1,20 @@
+---
+
+- block:
+    - when: navidrome_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+
+    - when: navidrome_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+  tags:
+    - setup-all
+    - setup-navidrome
+    - install-all
+    - install-navidrome
+
+- block:
+    - when: not navidrome_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
+  tags:
+    - setup-all
+    - setup-navidrome
