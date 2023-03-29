@@ -118,7 +118,7 @@ navidrome_container_additional_volumes: []
 navidrome_container_extra_arguments: []
 
 # Controls the `ND_SCANSCHEDULE` environment variable
-navidrome_environment_variable_nd_scanschedule: 24h
+navidrome_environment_variable_nd_scanschedule: 1m
 
 # Controls the `ND_SESSIONTIMEOUT` environment variable
 navidrome_environment_variable_nd_sessiontimeout: 24h
