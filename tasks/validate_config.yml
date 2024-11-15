@@ -3,15 +3,16 @@
 - name: Fail if required Navidrome settings not defined
   ansible.builtin.fail:
     msg: >
-      You need to define a required configuration setting (`{{ item }}`).
-  when: "vars[item] == ''"
+      You need to define a required configuration setting (`{{ item.name }}`).
+  when: "item.when | bool and vars[item.name] | length == 0"
   with_items:
-    - navidrome_identifier
-    - navidrome_uid
-    - navidrome_gid
-    - navidrome_hostname
-    - navidrome_path_prefix
-    - navidrome_container_network
+    - {'name': 'navidrome_identifier', when: true}
+    - {'name': 'navidrome_uid', when: true}
+    - {'name': 'navidrome_gid', when: true}
+    - {'name': 'navidrome_hostname', when: true}
+    - {'name': 'navidrome_path_prefix', when: true}
+    - {'name': 'navidrome_container_network', when: true}
+    - {'name': 'navidrome_container_labels_traefik_compression_middleware_name', when: "{{ navidrome_container_labels_traefik_compression_middleware_enabled }}"}
 
 - when: navidrome_container_labels_traefik_enabled | bool
   block:

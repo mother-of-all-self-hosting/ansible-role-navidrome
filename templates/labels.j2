@@ -7,6 +7,10 @@ traefik.docker.network={{ navidrome_container_labels_traefik_docker_network }}
 
 {% set middlewares = [] %}
 
+{% if navidrome_container_labels_traefik_compression_middleware_enabled %}
+{% set middlewares = middlewares + [navidrome_container_labels_traefik_compression_middleware_name] %}
+{% endif %}
+
 {% if navidrome_container_labels_traefik_path_prefix != '/' %}
 traefik.http.middlewares.{{ navidrome_identifier }}-slashless-redirect.redirectregex.regex=^({{ navidrome_container_labels_traefik_path_prefix | quote }})$
 traefik.http.middlewares.{{ navidrome_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
