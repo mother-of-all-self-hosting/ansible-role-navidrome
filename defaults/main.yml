@@ -9,7 +9,7 @@ navidrome_identifier: navidrome
 navidrome_uid: ''
 navidrome_gid: ''
 
-navidrome_version: 0.53.3
+navidrome_version: 0.54.1
 
 navidrome_scheme: https
 
@@ -137,6 +137,11 @@ navidrome_environment_variable_nd_baseurl: "{{ '' if navidrome_path_prefix == '/
 
 # Controls the `ND_MUSICFOLDER` environment variable
 navidrome_environment_variable_nd_musicfolder: /music
+
+# Controls the `ND_ENABLEINSIGHTSCOLLECTOR` environment variable.
+# Enabling this enables the "Anonymous Data Collection" telemetry feature.
+# See: https://www.navidrome.org/docs/getting-started/insights/
+navidrome_environment_variable_nd_enableinsightscollector: false
 
 # Additional environment variables.
 navidrome_environment_variables_additional_variables: ''
