@@ -9,7 +9,7 @@ navidrome_identifier: navidrome
 navidrome_uid: ''
 navidrome_gid: ''
 
-navidrome_version: 0.54.5
+navidrome_version: 0.55.0
 
 navidrome_scheme: https
 
