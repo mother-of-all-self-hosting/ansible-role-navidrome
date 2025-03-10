@@ -122,7 +122,12 @@ navidrome_container_additional_volumes: []
 # A list of extra arguments to pass to the container
 navidrome_container_extra_arguments: []
 
+# Controls the `ND_SCANNER_ENABLED` environment variable.
+# Set to `false` to disable automatic scanning of the music library.
+navidrome_environment_variable_nd_scanner_enabled: true
+
 # Controls the `ND_SCANNER_SCHEDULE` environment variable
+# Use Golang cron syntax: https://pkg.go.dev/github.com/robfig/cron
 navidrome_environment_variable_nd_scanner_schedule: 1m
 
 # Controls the `ND_SESSIONTIMEOUT` environment variable
