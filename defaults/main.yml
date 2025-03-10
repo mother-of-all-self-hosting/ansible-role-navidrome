@@ -9,7 +9,7 @@ navidrome_identifier: navidrome
 navidrome_uid: ''
 navidrome_gid: ''
 
-navidrome_version: 0.54.5
+navidrome_version: 0.55.0
 
 navidrome_scheme: https
 
@@ -122,8 +122,8 @@ navidrome_container_additional_volumes: []
 # A list of extra arguments to pass to the container
 navidrome_container_extra_arguments: []
 
-# Controls the `ND_SCANSCHEDULE` environment variable
-navidrome_environment_variable_nd_scanschedule: 1m
+# Controls the `ND_SCANNER_SCHEDULE` environment variable
+navidrome_environment_variable_nd_scanner_schedule: 1m
 
 # Controls the `ND_SESSIONTIMEOUT` environment variable
 navidrome_environment_variable_nd_sessiontimeout: 24h
