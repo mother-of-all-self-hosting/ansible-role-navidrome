@@ -211,8 +211,11 @@ navidrome_floc_optout_enabled: true
 # See: `navidrome_http_header_strict_transport_security`
 navidrome_hsts_preload_enabled: false
 
-# List of systemd services that navidrome.service depends on
+# List of systemd services that the Navidrome systemd service depends on
 navidrome_systemd_required_services_list: "{{ navidrome_systemd_required_systemd_services_list_default + navidrome_systemd_required_systemd_services_list_auto + navidrome_systemd_required_systemd_services_list_custom }}"
 navidrome_systemd_required_systemd_services_list_default: "{{ [devture_systemd_docker_base_docker_service_name] if devture_systemd_docker_base_docker_service_name else [] }}"
 navidrome_systemd_required_systemd_services_list_auto: []
 navidrome_systemd_required_systemd_services_list_custom: []
+
+# List of systemd services that the Navidrome systemd service wants
+navidrome_systemd_wanted_services_list: []
