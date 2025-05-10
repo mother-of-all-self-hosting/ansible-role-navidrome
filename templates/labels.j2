@@ -56,7 +56,7 @@ traefik.http.routers.{{ navidrome_identifier }}.tls={{ navidrome_container_label
 traefik.http.routers.{{ navidrome_identifier }}.tls.certResolver={{ navidrome_container_labels_traefik_tls_certResolver }}
 {% endif %}
 
-traefik.http.services.{{ navidrome_identifier }}.loadbalancer.server.port=4533
+traefik.http.services.{{ navidrome_identifier }}.loadbalancer.server.port={{ navidrome_container_http_port }}
 {% endif %}
 
 {{ navidrome_container_labels_additional_labels }}

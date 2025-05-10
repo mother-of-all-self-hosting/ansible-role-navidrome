@@ -42,6 +42,9 @@ navidrome_container_image_force_pull: "{{ navidrome_container_image.endswith(':l
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 navidrome_container_network: "{{ navidrome_identifier }}"
 
+# The port number in the container
+navidrome_container_http_port: 4533
+
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
 # Use this to expose this container to another reverse proxy, which runs in a different container network.
