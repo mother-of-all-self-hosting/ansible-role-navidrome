@@ -1,4 +1,8 @@
+# SPDX-FileCopyrightText: 2023 - 2024 Nikita Chernyi
 # SPDX-FileCopyrightText: 2023 - 2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
+# SPDX-FileCopyrightText: 2025 MASH project contributors
+# SPDX-FileCopyrightText: 2025 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -29,8 +33,10 @@ navidrome_base_path: "/{{ navidrome_identifier }}"
 navidrome_data_path: "{{ navidrome_base_path }}/data"
 
 navidrome_container_image: "{{ navidrome_container_image_registry_prefix }}deluan/navidrome:{{ navidrome_container_image_tag }}"
-navidrome_container_image_registry_prefix: docker.io/
 navidrome_container_image_tag: "{{ navidrome_version }}"
+navidrome_container_image_registry_prefix: "{{ navidrome_container_image_registry_prefix_upstream }}"
+navidrome_container_image_registry_prefix_upstream: "{{ navidrome_container_image_registry_prefix_upstream_default }}"
+navidrome_container_image_registry_prefix_upstream_default: docker.io/
 navidrome_container_image_force_pull: "{{ navidrome_container_image.endswith(':latest') }}"
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
