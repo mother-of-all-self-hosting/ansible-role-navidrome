@@ -13,6 +13,7 @@ navidrome_identifier: navidrome
 navidrome_uid: ''
 navidrome_gid: ''
 
+# renovate: datasource=docker depName=deluan/navidrome versioning=semver
 navidrome_version: 0.55.2
 
 navidrome_scheme: https
