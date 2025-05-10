@@ -29,7 +29,7 @@ ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
 			--read-only \
 			--network={{ navidrome_container_network }} \
 			{% if navidrome_container_http_bind_port %}
-			-p {{ navidrome_container_http_bind_port }}:4533 \
+			-p {{ navidrome_container_http_bind_port }}:{{ navidrome_container_http_port }} \
 			{% endif %}
 			--env-file={{ navidrome_base_path }}/env \
 			--label-file={{ navidrome_base_path }}/labels \
