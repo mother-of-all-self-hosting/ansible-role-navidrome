@@ -26,28 +26,28 @@ ExecStartPre=-{{ devture_systemd_docker_base_host_command_sh }} -c '{{ devture_s
 
 {# We mount a tmpfs at /tmp to allow Navidrome migrations to run. #}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} create \
-			--rm \
-			--name={{ navidrome_identifier }} \
-			--log-driver=none \
-			--user={{ navidrome_uid }}:{{ navidrome_gid }} \
-			--cap-drop=ALL \
-			--read-only \
-			--network={{ navidrome_container_network }} \
-			{% if navidrome_container_http_bind_port %}
-			-p {{ navidrome_container_http_bind_port }}:{{ navidrome_container_http_port }} \
-			{% endif %}
-			--env-file={{ navidrome_base_path }}/env \
-			--label-file={{ navidrome_base_path }}/labels \
-			--health-interval={{ navidrome_container_health_interval }} \
-			--tmpfs=/tmp:rw,noexec,nosuid,size=100m \
-			--mount type=bind,src={{ navidrome_data_path }},dst=/data \
-			{% for volume in navidrome_container_additional_volumes %}
-			--mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
-			{% endfor %}
-			{% for arg in navidrome_container_extra_arguments %}
-			{{ arg }} \
-			{% endfor %}
-			{{ navidrome_container_image }}
+      --rm \
+      --name={{ navidrome_identifier }} \
+      --log-driver=none \
+      --user={{ navidrome_uid }}:{{ navidrome_gid }} \
+      --cap-drop=ALL \
+      --read-only \
+      --network={{ navidrome_container_network }} \
+      {% if navidrome_container_http_bind_port %}
+      -p {{ navidrome_container_http_bind_port }}:{{ navidrome_container_http_port }} \
+      {% endif %}
+      --env-file={{ navidrome_base_path }}/env \
+      --label-file={{ navidrome_base_path }}/labels \
+      --health-interval={{ navidrome_container_health_interval }} \
+      --tmpfs=/tmp:rw,noexec,nosuid,size=100m \
+      --mount type=bind,src={{ navidrome_data_path }},dst=/data \
+      {% for volume in navidrome_container_additional_volumes %}
+      --mount type={{ volume.type | default('bind' if '/' in volume.src else 'volume') }},src={{ volume.src }},dst={{ volume.dst }}{{ (',' + volume.options) if volume.options | default('') else '' }} \
+      {% endfor %}
+      {% for arg in navidrome_container_extra_arguments %}
+      {{ arg }} \
+      {% endfor %}
+      {{ navidrome_container_image }}
 
 {% for network in navidrome_container_additional_networks %}
 ExecStartPre={{ devture_systemd_docker_base_host_command_docker }} network connect {{ network }} {{ navidrome_identifier }}
