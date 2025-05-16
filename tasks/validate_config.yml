@@ -12,6 +12,9 @@
   when: "item.old in vars"
   with_items:
     - {'old': 'navidrome_environment_variable_nd_scanschedule', 'new': 'navidrome_environment_variable_nd_scanner_schedule'}
+    - {'old': 'navidrome_systemd_required_systemd_services_list_default', 'new': 'navidrome_systemd_required_services_list_default'}
+    - {'old': 'navidrome_systemd_required_systemd_services_list_auto', 'new': 'navidrome_systemd_required_services_list_auto'}
+    - {'old': 'navidrome_systemd_required_systemd_services_list_custom', 'new': 'navidrome_systemd_required_services_list_custom'}
 
 - name: Fail if required Navidrome settings not defined
   ansible.builtin.fail:
