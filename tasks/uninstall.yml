@@ -23,7 +23,7 @@
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ navidrome_identifier }}.service"
         state: absent
 
-    - name: Ensure Navidrome path doesn't exist
+    - name: Ensure Navidrome path does not exist
       ansible.builtin.file:
         path: "{{ navidrome_base_path }}"
         state: absent
