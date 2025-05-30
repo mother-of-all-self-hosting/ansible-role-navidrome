@@ -3,27 +3,25 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-
 - name: Perform Navidrome installation tasks
-  block:
-    - name: Validate Navidrome configuration
-      when: navidrome_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
-
-    - name: Install Navidrome
-      when: navidrome_enabled | bool
-      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
   tags:
     - setup-all
     - setup-navidrome
     - install-all
     - install-navidrome
+  block:
+    - name: Validate Navidrome configuration
+      when: navidrome_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+    - name: Install Navidrome
+      when: navidrome_enabled | bool
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
 - name: Perform Navidrome uninstallation tasks
+  tags:
+    - setup-all
+    - setup-navidrome
   block:
     - name: Uninstall Navidrome
       when: not navidrome_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
-  tags:
-    - setup-all
-    - setup-navidrome
