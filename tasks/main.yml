@@ -4,6 +4,7 @@
 
 ---
 - name: Perform Navidrome installation tasks
+  when: navidrome_enabled | bool
   tags:
     - setup-all
     - setup-navidrome
@@ -11,17 +12,15 @@
     - install-navidrome
   block:
     - name: Validate Navidrome configuration
-      when: navidrome_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
     - name: Install Navidrome
-      when: navidrome_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
 - name: Perform Navidrome uninstallation tasks
+  when: not navidrome_enabled | bool
   tags:
     - setup-all
     - setup-navidrome
   block:
     - name: Uninstall Navidrome
-      when: not navidrome_enabled | bool
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
