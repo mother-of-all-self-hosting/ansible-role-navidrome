@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2023 - 2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -25,27 +26,53 @@
     - env
     - labels
 
-- name: Ensure Navidrome container image is pulled via community.docker.docker_image
-  when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
-  community.docker.docker_image:
-    name: "{{ navidrome_container_image }}"
-    source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
-    force_source: "{{ navidrome_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-    force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else navidrome_container_image_force_pull }}"
-  register: result
-  retries: "{{ devture_playbook_help_container_retries_count }}"
-  delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: result is not failed
+- name: Run if self-building of Navidrome container image is not enabled
+  when: "not navidrome_container_image_self_build | bool"
+  block:
+    - name: Ensure Navidrome container image is pulled via community.docker.docker_image
+      when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
+      community.docker.docker_image:
+        name: "{{ navidrome_container_image }}"
+        source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
+        force_source: "{{ navidrome_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else navidrome_container_image_force_pull }}"
+      register: result
+      retries: "{{ devture_playbook_help_container_retries_count }}"
+      delay: "{{ devture_playbook_help_container_retries_delay }}"
+      until: result is not failed
 
-- name: Ensure Navidrome container image is pulled via ansible.builtin.command
-  when: devture_systemd_docker_base_container_image_pull_method == 'command'
-  ansible.builtin.command:
-    cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ navidrome_container_image }}"
-  register: result
-  retries: "{{ devture_playbook_help_container_retries_count }}"
-  delay: "{{ devture_playbook_help_container_retries_delay }}"
-  until: result is not failed
-  changed_when: "'Downloaded newer image' in result.stdout"
+    - name: Ensure Navidrome container image is pulled via ansible.builtin.command
+      when: devture_systemd_docker_base_container_image_pull_method == 'command'
+      ansible.builtin.command:
+        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ navidrome_container_image }}"
+      register: result
+      retries: "{{ devture_playbook_help_container_retries_count }}"
+      delay: "{{ devture_playbook_help_container_retries_delay }}"
+      until: result is not failed
+      changed_when: "'Downloaded newer image' in result.stdout"
+
+- name: Run if self-building of Navidrome container image is enabled
+  when: "navidrome_container_image_self_build | bool"
+  block:
+    - name: Ensure Navidrome repository is present on self-build
+      ansible.builtin.git:
+        repo: "{{ navidrome_container_repo }}"
+        version: "{{ navidrome_container_repo_version }}"
+        dest: "{{ navidrome_container_src_files_path }}"
+        force: "yes"
+      register: navidrome_git_pull_results
+
+    - name: Ensure Navidrome container image is built
+      ansible.builtin.shell:
+        chdir: "{{ navidrome_container_src_files_path }}"
+        cmd: |
+          {{ devture_systemd_docker_base_host_command_docker }} build \
+          -t "{{ navidrome_container_image }}" \
+          -f Dockerfile \
+          .
+      environment:
+        BUILDPLATFORM: "{{ navidrome_container_image_self_build_environment_buildplatform }}"
+      changed_when: true
 
 - name: Ensure Navidrome container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'

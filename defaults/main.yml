@@ -37,6 +37,13 @@ navidrome_container_image_registry_prefix_upstream: "{{ navidrome_container_imag
 navidrome_container_image_registry_prefix_upstream_default: docker.io/
 navidrome_container_image_force_pull: "{{ navidrome_container_image.endswith(':latest') }}"
 
+navidrome_container_image_self_build: false
+navidrome_container_image_name: "navidrome/navidrome:{{ navidrome_container_repo_version }}"
+navidrome_container_repo: "https://github.com/navidrome/navidrome.git"
+navidrome_container_repo_version: "{{ 'v' + navidrome_version if navidrome_version != 'latest' else 'master' }}"
+navidrome_container_src_files_path: "{{ navidrome_base_path }}/docker-src"
+navidrome_container_image_self_build_environment_buildplatform: linux/amd64
+
 # Specifies how the container publishes its HTTP port
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:4533"), just a port number or an empty string to not expose.
