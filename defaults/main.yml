@@ -38,7 +38,6 @@ navidrome_container_image_registry_prefix_upstream_default: docker.io/
 navidrome_container_image_force_pull: "{{ navidrome_container_image.endswith(':latest') }}"
 
 navidrome_container_image_self_build: false
-navidrome_container_image_name: "navidrome/navidrome:{{ navidrome_container_repo_version }}"
 navidrome_container_repo: "https://github.com/navidrome/navidrome.git"
 navidrome_container_repo_version: "{{ 'v' + navidrome_version if navidrome_version != 'latest' else 'master' }}"
 navidrome_container_src_files_path: "{{ navidrome_base_path }}/docker-src"
