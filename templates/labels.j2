@@ -24,8 +24,8 @@ traefik.http.middlewares.{{ navidrome_identifier }}-slashless-redirect.redirectr
 {% endif %}
 
 {#
-	Intentionally not adding a stripPrefix middleware.
-	Navidrome seems to serve itself under the same prefix it sees in the ND_BASEURL environment variable.
+  Intentionally not adding a stripPrefix middleware.
+  Navidrome seems to serve itself under the same prefix it sees in the ND_BASEURL environment variable.
 #}
 
 {% if navidrome_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
