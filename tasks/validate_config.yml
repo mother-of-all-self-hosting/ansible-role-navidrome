@@ -33,7 +33,7 @@
 - name: Run if Traefik is enabled
   when: navidrome_container_labels_traefik_enabled | bool
   block:
-    - name: Fail if required Navidrome Traefik settings not defined
+    - name: Fail if Traefik settings required for Navidrome are not defined
       ansible.builtin.fail:
         msg: >-
           You need to define a required configuration setting (`{{ item }}`).
