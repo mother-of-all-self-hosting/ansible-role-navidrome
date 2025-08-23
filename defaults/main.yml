@@ -188,7 +188,10 @@ navidrome_systemd_required_services_list_auto: []
 navidrome_systemd_required_services_list_custom: []
 
 # List of systemd services that the Navidrome systemd service wants
-navidrome_systemd_wanted_services_list: []
+navidrome_systemd_wanted_services_list: "{{ navidrome_systemd_wanted_services_list_default + navidrome_systemd_wanted_services_list_auto + navidrome_systemd_wanted_services_list_custom }}"
+navidrome_systemd_wanted_services_list_default: []
+navidrome_systemd_wanted_services_list_auto: []
+navidrome_systemd_wanted_services_list_custom: []
 
 # Controls the `ND_SCANNER_ENABLED` environment variable.
 # Set to `false` to disable automatic scanning of the music library.
