@@ -30,6 +30,12 @@
     - "name": "navidrome_container_labels_traefik_compression_middleware_name"
       when: "{{ navidrome_container_labels_traefik_compression_middleware_enabled }}"
 
+- name: Fail if Navidrome logging level is invalid
+  ansible.builtin.fail:
+    msg: >-
+      navidrome_environment_variable_nd_loglevel must be 'error', 'warn', 'info', 'debug', or 'trace'
+  when: "navidrome_environment_variable_nd_loglevel not in ['error', 'warn', 'info', 'debug', 'trace']"
+
 - name: Run if Traefik is enabled
   when: navidrome_container_labels_traefik_enabled | bool
   block:
