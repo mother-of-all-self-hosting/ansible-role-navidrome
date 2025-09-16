@@ -14,6 +14,7 @@
     - { "old": "navidrome_systemd_required_systemd_services_list_default", "new": "navidrome_systemd_required_services_list_default" }
     - { "old": "navidrome_systemd_required_systemd_services_list_auto", "new": "navidrome_systemd_required_services_list_auto" }
     - { "old": "navidrome_systemd_required_systemd_services_list_custom", "new": "navidrome_systemd_required_services_list_custom" }
+    - { "old": "navidrome_http_header_content_permission_policy", "new": "navidrome_http_header_permissions_policy" }
 
 - name: Fail if required Navidrome settings not defined
   ansible.builtin.fail:
