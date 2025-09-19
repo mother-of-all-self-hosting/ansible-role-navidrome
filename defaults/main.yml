@@ -202,7 +202,7 @@ navidrome_environment_variable_nd_scanner_enabled: true
 navidrome_environment_variable_nd_scanner_schedule: 1m
 
 # Controls the `ND_SESSIONTIMEOUT` environment variable
-navidrome_environment_variable_nd_sessiontimeout: 24h
+navidrome_environment_variable_nd_sessiontimeout: 48h
 
 # Controls the `ND_LOGLEVEL` environment variable.
 # Valid values are: error, warn, info, debug, trace
