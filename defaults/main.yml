@@ -132,7 +132,9 @@ navidrome_container_labels_additional_labels: ''
 navidrome_container_health_interval: "{{ '5s' if navidrome_container_labels_traefik_enabled else '30s' }}"
 
 # A list of extra arguments to pass to the container
-navidrome_container_extra_arguments: []
+navidrome_container_extra_arguments: "{{ navidrome_container_extra_arguments_auto + navidrome_container_extra_arguments_custom }}"
+navidrome_container_extra_arguments_auto: []
+navidrome_container_extra_arguments_custom: []
 
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
