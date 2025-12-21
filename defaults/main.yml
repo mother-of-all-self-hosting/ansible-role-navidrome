@@ -18,11 +18,11 @@ navidrome_data_path: "{{ navidrome_base_path }}/data"
 # renovate: datasource=docker depName=deluan/navidrome versioning=semver
 navidrome_version: 0.59.0
 
-navidrome_uid: ''
-navidrome_gid: ''
+navidrome_uid: ""
+navidrome_gid: ""
 
 # The hostname at which navidrome is served.
-navidrome_hostname: ''
+navidrome_hostname: ""
 
 navidrome_scheme: https
 
@@ -47,7 +47,7 @@ navidrome_container_image_self_build_environment_buildplatform: linux/amd64
 # Specifies how the container publishes its HTTP port
 #
 # Takes an "<ip>:<port>" value (e.g. "127.0.0.1:4533"), just a port number or an empty string to not expose.
-navidrome_container_http_bind_port: ''
+navidrome_container_http_bind_port: ""
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 navidrome_container_network: "{{ navidrome_identifier }}"
@@ -228,4 +228,4 @@ navidrome_environment_variable_nd_musicfolder: /music
 navidrome_environment_variable_nd_enableinsightscollector: false
 
 # Additional environment variables.
-navidrome_environment_variables_additional_variables: ''
+navidrome_environment_variables_additional_variables: ""
