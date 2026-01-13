@@ -74,7 +74,7 @@ navidrome_container_additional_volumes_custom: []
 # navidrome_container_labels_traefik_enabled controls whether labels to assist a Traefik reverse-proxy will be attached to the container.
 # See `../templates/labels.j2` for details.
 #
-# To inject your own other container labels, see `navidrome_container_labels_additional_labels`.
+# To inject your own other container labels, see `navidrome_container_labels_additional_labels_custom`.
 navidrome_container_labels_traefik_enabled: true
 navidrome_container_labels_traefik_docker_network: "{{ navidrome_container_network }}"
 navidrome_container_labels_traefik_hostname: "{{ navidrome_hostname }}"
