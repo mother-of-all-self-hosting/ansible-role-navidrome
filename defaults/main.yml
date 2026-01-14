@@ -21,10 +21,11 @@ navidrome_version: 0.59.0
 navidrome_uid: ""
 navidrome_gid: ""
 
+# The scheme used for serving navidrome.
+navidrome_scheme: https
+
 # The hostname at which navidrome is served.
 navidrome_hostname: ""
-
-navidrome_scheme: https
 
 # The path at which navidrome is served.
 # This value must either be `/` or not end with a slash (e.g. `/navidrome`).
@@ -44,10 +45,10 @@ navidrome_container_image_self_build_repo_version: "{{ 'v' + navidrome_version i
 navidrome_container_image_self_build_src_files_path: "{{ navidrome_base_path }}/docker-src"
 navidrome_container_image_self_build_environment_buildplatform: linux/amd64
 
-# Specifies how the container publishes its HTTP port
+# Controls whether the container exposes its HTTP port (tcp/4533 in the container).
 #
-# Takes an "<ip>:<port>" value (e.g. "127.0.0.1:4533"), just a port number or an empty string to not expose.
-navidrome_container_http_bind_port: ""
+# Takes an "<ip>:<port>" or "<port>" value (e.g. "127.0.0.1:2586"), or empty string to not expose.
+navidrome_container_http_host_bind_port: ""
 
 # The base container network. It will be auto-created by this role if it doesn't exist already.
 navidrome_container_network: "{{ navidrome_identifier }}"
