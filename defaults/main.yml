@@ -16,7 +16,7 @@ navidrome_base_path: "/{{ navidrome_identifier }}"
 navidrome_data_path: "{{ navidrome_base_path }}/data"
 
 # renovate: datasource=docker depName=deluan/navidrome versioning=semver
-navidrome_version: 0.59.0
+navidrome_version: 0.60.0
 
 navidrome_uid: ""
 navidrome_gid: ""
