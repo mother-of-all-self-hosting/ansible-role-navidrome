@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2023 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -24,6 +24,28 @@
         path: "{{ devture_systemd_docker_base_systemd_path }}/{{ navidrome_identifier }}.service"
         state: absent
 
+    - name: Ensure Navidrome support files do not exist
+      ansible.builtin.file:
+        path: "{{ navidrome_base_path }}/{{ item }}"
+        state: absent
+      with_items:
+        - env
+        - labels
+
+    - name: Ensure Navidrome local data path does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ navidrome_data_path }}"
+      register: navidrome_data_path_deletion_result
+      changed_when: navidrome_data_path_deletion_result.rc == 0
+      failed_when: false
+
+    - name: Ensure Navidrome base path does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ navidrome_base_path }}"
+      register: navidrome_base_path_deletion_result
+      changed_when: navidrome_base_path_deletion_result.rc == 0
+      failed_when: false
+
     - name: Ensure Navidrome container network does not exist
       when: navidrome_container_network_deletion_enabled
       block:
@@ -43,7 +65,20 @@
           register: navidrome_network_deletion_result
           changed_when: navidrome_container_network in navidrome_network_deletion_result.stdout
 
-    - name: Ensure Navidrome path does not exist
-      ansible.builtin.file:
-        path: "{{ navidrome_base_path }}"
-        state: absent
+- name: Check existence of Navidrome local data path
+  ansible.builtin.stat:
+    path: "{{ navidrome_data_path }}"
+  register: navidrome_data_path_stat
+
+# We just want to notify the user. Deleting data is too destructive.
+- name: Notify if Navidrome local data remains
+  when: navidrome_data_path_stat.stat.exists | bool
+  ansible.builtin.set_fact:
+    devture_playbook_runtime_messages_list: |
+      {{
+        devture_playbook_runtime_messages_list | default([])
+        +
+        [
+          "Note: As the local Navidrome instance has been removed, some old data remains in `" + navidrome_data_path + "`. Feel free to delete it."
+        ]
+      }}
