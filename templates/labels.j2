@@ -1,5 +1,7 @@
 {#
+SPDX-FileCopyrightText: 2023 Julian-Samuel Gebühr
 SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 #}
@@ -57,6 +59,52 @@ traefik.http.routers.{{ navidrome_identifier }}.tls.certResolver={{ navidrome_co
 {% endif %}
 
 traefik.http.services.{{ navidrome_identifier }}.loadbalancer.server.port={{ navidrome_container_http_port }}
+
+{% if navidrome_container_labels_traefik_metrics_enabled %}
+########################################################################
+#                                                                      #
+# Metrics                                                              #
+#                                                                      #
+########################################################################
+
+{% set middlewares = navidrome_container_labels_traefik_metrics_middlewares %}
+
+{% if navidrome_container_labels_traefik_metrics_middleware_basic_auth_enabled %}
+traefik.http.middlewares.{{ navidrome_identifier }}-metrics-basic-auth.basicauth.users={{ navidrome_container_labels_traefik_metrics_middleware_basic_auth_users }}
+{% set middlewares = middlewares + [navidrome_identifier + '-metrics-basic-auth'] %}
+{% endif %}
+
+traefik.http.middlewares.{{ navidrome_identifier }}-metrics-replace-path.replacepath.path={% if navidrome_path_prefix != '/' %}{{ navidrome_path_prefix }}{% endif %}{{ navidrome_environment_variable_nd_prometheus_metricspath }}
+{% set middlewares = middlewares + [navidrome_identifier + '-metrics-replace-path'] %}
+
+traefik.http.routers.{{ navidrome_identifier }}-metrics.rule={{ navidrome_container_labels_traefik_metrics_rule }}
+
+{% if navidrome_container_labels_traefik_metrics_priority | int > 0 %}
+traefik.http.routers.{{ navidrome_identifier }}-metrics.priority={{ navidrome_container_labels_traefik_metrics_priority }}
+{% endif %}
+
+traefik.http.routers.{{ navidrome_identifier }}-metrics.service={{ navidrome_identifier }}-metrics
+
+{% if middlewares | length > 0 %}
+traefik.http.routers.{{ navidrome_identifier }}-metrics.middlewares={{ middlewares | join(',') }}
+{% endif %}
+
+traefik.http.routers.{{ navidrome_identifier }}-metrics.entrypoints={{ navidrome_container_labels_traefik_metrics_entrypoints }}
+
+traefik.http.routers.{{ navidrome_identifier }}-metrics.tls={{ navidrome_container_labels_traefik_metrics_tls | to_json }}
+{% if navidrome_container_labels_traefik_metrics_tls %}
+traefik.http.routers.{{ navidrome_identifier }}-metrics.tls.certResolver={{ navidrome_container_labels_traefik_metrics_tls_certResolver }}
+{% endif %}
+
+traefik.http.services.{{ navidrome_identifier }}-metrics.loadbalancer.server.port={{ navidrome_container_http_port }}
+
+########################################################################
+#                                                                      #
+# /Metrics                                                             #
+#                                                                      #
+########################################################################
+{% endif %}
+
 {% endif %}
 
 {% for arg in navidrome_container_labels_additional_labels %}

@@ -1,8 +1,9 @@
-# SPDX-FileCopyrightText: 2023 - 2024 Nikita Chernyi
-# SPDX-FileCopyrightText: 2023 - 2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2023, 2024 Julian-Samuel Gebühr
+# SPDX-FileCopyrightText: 2023, 2024 Nikita Chernyi
+# SPDX-FileCopyrightText: 2023, 2025 MASH project contributors
+# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
 # SPDX-FileCopyrightText: 2024 Sergio Durigan Junior
-# SPDX-FileCopyrightText: 2025 MASH project contributors
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -89,6 +90,21 @@ navidrome_container_labels_traefik_priority: 0
 navidrome_container_labels_traefik_entrypoints: web-secure
 navidrome_container_labels_traefik_tls: "{{ navidrome_container_labels_traefik_entrypoints != 'web' }}"
 navidrome_container_labels_traefik_tls_certResolver: default  # noqa var-naming
+
+# Controls if labels are added to expose the Prometheus metrics publicly.
+navidrome_container_labels_traefik_metrics_enabled: "{{ navidrome_environment_variable_nd_prometheus_enabled }}"
+navidrome_container_labels_traefik_metrics_hostname: "{{ navidrome_hostname }}"
+# The path prefix must either be `/` or not end with a slash (e.g. `/metrics`).
+navidrome_container_labels_traefik_metrics_path_prefix: "{{ navidrome_environment_variable_nd_prometheus_metricspath }}"
+navidrome_container_labels_traefik_metrics_rule: "Host(`{{ navidrome_container_labels_traefik_metrics_hostname }}`){% if navidrome_container_labels_traefik_metrics_path_prefix != '/' %} && PathPrefix(`{{ navidrome_container_labels_traefik_metrics_path_prefix }}`){% endif %}"
+navidrome_container_labels_traefik_metrics_priority: 0
+navidrome_container_labels_traefik_metrics_entrypoints: "{{ navidrome_container_labels_traefik_entrypoints }}"
+navidrome_container_labels_traefik_metrics_middlewares: []
+navidrome_container_labels_traefik_metrics_tls: "{{ navidrome_container_labels_traefik_metrics_entrypoints != 'web' }}"
+navidrome_container_labels_traefik_metrics_tls_certResolver: "{{ navidrome_container_labels_traefik_tls_certResolver }}"  # noqa var-naming
+navidrome_container_labels_traefik_metrics_middleware_basic_auth_enabled: false
+# See: https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/
+navidrome_container_labels_traefik_metrics_middleware_basic_auth_users: ""
 
 # Controls whether a compression middleware will be injected into the middlewares list.
 # This compression middleware is supposed to be defined elsewhere (using labels or a File provider, etc.) and is merely referenced by this router.
@@ -259,6 +275,12 @@ navidrome_environment_variable_nd_baseurl: "{{ '' if navidrome_path_prefix == '/
 
 # Controls the `ND_MUSICFOLDER` environment variable
 navidrome_environment_variable_nd_musicfolder: /music
+
+# Control if extra endpoint with Prometheus metrics is enabled
+navidrome_environment_variable_nd_prometheus_enabled: false
+
+# Specify custom path for Prometheus metrics
+navidrome_environment_variable_nd_prometheus_metricspath: /metrics
 
 # Controls the `ND_ENABLEINSIGHTSCOLLECTOR` environment variable.
 # Enabling this enables the "Anonymous Data Collection" telemetry feature.
