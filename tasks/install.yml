@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2023 - 2025 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -62,17 +62,13 @@
       register: navidrome_git_pull_results
 
     - name: Ensure Navidrome container image is built
-      ansible.builtin.shell:
-        chdir: "{{ navidrome_container_image_self_build_src_files_path }}"
-        cmd: |
-          {{ devture_systemd_docker_base_host_command_docker }} build \
-          -t "{{ navidrome_container_image_self_build_name }}" \
-          -f Dockerfile \
-          .
-      environment:
-        BUILDPLATFORM: "{{ navidrome_container_image_self_build_environment_buildplatform }}"
+      community.docker.docker_image_build:
+        name: "{{ navidrome_container_image_self_build_name }}"
+        dockerfile: Dockerfile
+        path: "{{ navidrome_container_image_self_build_src_files_path }}"
+        pull: true
+        rebuild: "{{ 'always' if navidrome_git_pull_results.changed | bool else 'never' }}"
       register: navidrome_container_image_build_result
-      changed_when: "'Successfully built' in navidrome_container_image_build_result.stdout or ('writing image' in navidrome_container_image_build_result.stderr and '#34 CACHED' not in navidrome_container_image_build_result.stderr)"
 
 - name: Ensure Navidrome container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
