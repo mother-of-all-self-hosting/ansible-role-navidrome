@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2026 Suguru Hirahara
+# SPDX-FileCopyrightText: 2026 spatterlight
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Verify Navidrome systemd service
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Wait for Navidrome service to become active (up to 180s)
+      ansible.builtin.systemd:
+        name: navidrome.service
+      register: navidrome_service
+      until: navidrome_service.status.ActiveState == 'active'
+      retries: 36
+      delay: 5
+
+    - name: Assert Navidrome service is active
+      ansible.builtin.assert:
+        that: navidrome_service.status.ActiveState == 'active'
+        fail_msg: "navidrome.service not active ({{ navidrome_service.status.ActiveState }})"
+        success_msg: "navidrome.service is active"
+
+    - name: Wait for Navidrome HTTP endpoint to respond (up to 10m)
+      ansible.builtin.uri:
+        url: "http://localhost:4533/"
+        method: GET
+        status_code: [200, 302]
+        follow_redirects: none
+      register: navidrome_endpoint
+      until: navidrome_endpoint.status in [200, 302]
+      retries: 120
+      delay: 5
+
+    - name: Assert Navidrome HTTP endpoint responds
+      ansible.builtin.assert:
+        that: navidrome_endpoint.status in [200, 302]
+        fail_msg: "Navidrome did not respond as expected ({{ navidrome_endpoint.status | default('no response') }})"
+        success_msg: "Navidrome responded with {{ navidrome_endpoint.status }}"
+
+    - name: Show Navidrome systemd service status summary
+      ansible.builtin.debug:
+        msg:
+          - "Navidrome systemd: {{ navidrome_service.status.ActiveState }}"
+          - "Navidrome HTTP: {{ navidrome_endpoint.status }}"
