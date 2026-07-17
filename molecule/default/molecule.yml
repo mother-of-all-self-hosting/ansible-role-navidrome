@@ -27,6 +27,10 @@ provisioner:
   inventory:
     group_vars:
       all:
+        # Helper variables
+        navidrome_debug_service_enabled: false
+
+        # Variables for Navidrome
         navidrome_uid: 1000
         navidrome_gid: 1000
         navidrome_hostname: navidrome
