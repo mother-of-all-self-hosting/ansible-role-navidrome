@@ -33,7 +33,8 @@ provisioner:
         # Variables for Navidrome
         navidrome_uid: 1000
         navidrome_gid: 1000
-        navidrome_hostname: navidrome
+        navidrome_scheme: http
+        navidrome_hostname: localhost
         navidrome_container_labels_traefik_enabled: false
         navidrome_container_http_host_bind_port: 4533
   env:
