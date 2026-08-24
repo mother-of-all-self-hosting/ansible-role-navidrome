@@ -3,7 +3,7 @@ galaxy_info:
   author: etke.cc
   company: etke.cc
   role_name: navidrome
-  namespace: etkecc
+  namespace: mash
   description: Navidrome
   platforms:
     - name: Debian
