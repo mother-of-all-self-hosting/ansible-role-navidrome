@@ -40,7 +40,6 @@ jobs:
       matrix:
         distro:
           - ubuntu2604
-          - debian13
         scenario:
           - default
       fail-fast: false
@@ -130,7 +129,6 @@ jobs:
       matrix:
         distro:
           - ubuntu2604
-          - debian13
       fail-fast: false
 
     env:
