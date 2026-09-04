@@ -107,16 +107,14 @@
 # Self-built images are exempt. Upstream's Dockerfile stamps the version from
 # its `GIT_TAG` build argument, which this role does not pass, so a self-built
 # Navidrome reports a placeholder version no matter what it was built from.
-- name: Assert the running Navidrome is the version the role asks for
+- name: Assert the running Navidrome is the version this role installs
   when: not (navidrome_container_image_self_build | default(false) | bool)
   ansible.builtin.assert:
     # The reported version has the build's git hash appended
     # (`0.63.2 (be10f89c)`), hence the prefix match.
     that: navidrome_server_version is match(navidrome_defaults.navidrome_version | regex_escape)
-    fail_msg: >-
-      Navidrome reports version {{ navidrome_server_version | default('none') }},
-      but the role asks for {{ navidrome_defaults.navidrome_version }}
-    success_msg: "Navidrome reports version {{ navidrome_server_version }}"
+    fail_msg: "Navidrome reports {{ navidrome_server_version | default('none') }}, expected {{ navidrome_defaults.navidrome_version }}"
+    success_msg: "Navidrome reports {{ navidrome_server_version }}"
 
 # The music library that Navidrome created for the configured music folder,
 # read back out of the database through the API.
