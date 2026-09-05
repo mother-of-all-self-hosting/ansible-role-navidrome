@@ -100,13 +100,6 @@
   ansible.builtin.set_fact:
     navidrome_server_version: "{{ navidrome_subsonic_ping.json['subsonic-response'].serverVersion }}"
 
-# Tying the running version to `navidrome_version` is what makes this
-# scenario a test of the value that Renovate bumps: a bump to an image that
-# does not exist, or that cannot serve, cannot pass here.
-#
-# Self-built images are exempt. Upstream's Dockerfile stamps the version from
-# its `GIT_TAG` build argument, which this role does not pass, so a self-built
-# Navidrome reports a placeholder version no matter what it was built from.
 - name: Assert the running Navidrome is the version this role installs
   when: not (navidrome_container_image_self_build | default(false) | bool)
   ansible.builtin.assert:
