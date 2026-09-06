@@ -96,7 +96,7 @@
     fail_msg: "The Subsonic API rejected the request: {{ navidrome_subsonic_ping.json | default('no payload') }}"
     success_msg: "The Subsonic API authenticated '{{ navidrome_verify_admin_username }}'"
 
-- name: Determine the version reported by the running Navidrome
+- name: Determine the version of the running Navidrome
   ansible.builtin.set_fact:
     navidrome_server_version: "{{ navidrome_subsonic_ping.json['subsonic-response'].serverVersion }}"
 
