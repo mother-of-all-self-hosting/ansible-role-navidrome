@@ -5,11 +5,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-# This play does not include the role, so its defaults are not in scope.
-# Reading defaults/main.yml directly ties the version assertion below to the
-# value that Renovate bumps, with nothing to keep in sync in this scenario.
-# The `name` keeps these out of the way of the scenario's group_vars.
-- name: Load the Navidrome role defaults
+# The role is not included in this playbook, so its defaults are not in
+# scope. Reading defaults/main.yml directly ties the version assertion
+# below.
+- name: Load the role defaults
   ansible.builtin.include_vars:
     file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
     name: navidrome_defaults
@@ -97,27 +96,18 @@
     fail_msg: "The Subsonic API rejected the request: {{ navidrome_subsonic_ping.json | default('no payload') }}"
     success_msg: "The Subsonic API authenticated '{{ navidrome_verify_admin_username }}'"
 
-- name: Determine the version reported by the running Navidrome
+- name: Determine the version of the running Navidrome
   ansible.builtin.set_fact:
     navidrome_server_version: "{{ navidrome_subsonic_ping.json['subsonic-response'].serverVersion }}"
 
-# Tying the running version to `navidrome_version` is what makes this
-# scenario a test of the value that Renovate bumps: a bump to an image that
-# does not exist, or that cannot serve, cannot pass here.
-#
-# Self-built images are exempt. Upstream's Dockerfile stamps the version from
-# its `GIT_TAG` build argument, which this role does not pass, so a self-built
-# Navidrome reports a placeholder version no matter what it was built from.
-- name: Assert the running Navidrome is the version the role asks for
+- name: Assert the running Navidrome is the version this role installs
   when: not (navidrome_container_image_self_build | default(false) | bool)
   ansible.builtin.assert:
     # The reported version has the build's git hash appended
     # (`0.63.2 (be10f89c)`), hence the prefix match.
     that: navidrome_server_version is match(navidrome_defaults.navidrome_version | regex_escape)
-    fail_msg: >-
-      Navidrome reports version {{ navidrome_server_version | default('none') }},
-      but the role asks for {{ navidrome_defaults.navidrome_version }}
-    success_msg: "Navidrome reports version {{ navidrome_server_version }}"
+    fail_msg: "Navidrome reports {{ navidrome_server_version | default('none') }}, expected {{ navidrome_defaults.navidrome_version }}"
+    success_msg: "Navidrome reports {{ navidrome_server_version }}"
 
 # The music library that Navidrome created for the configured music folder,
 # read back out of the database through the API.
@@ -174,12 +164,12 @@
     fail_msg: "The Navidrome web interface did not render as expected"
     success_msg: "The Navidrome web interface is served"
 
-- name: Show Navidrome verification summary
+- name: Show the Navidrome verification summary
   ansible.builtin.debug:
     msg:
       - "Navidrome systemd: {{ navidrome_service.status.ActiveState }}"
       - "Navidrome version: {{ navidrome_server_version }}"
-      - "Subsonic API: {{ navidrome_subsonic_ping.json['subsonic-response'].status }}"
-      - "Music folders: {{ navidrome_subsonic_music_folders.json['subsonic-response'].musicFolders.musicFolder | length }}"
-      - "Last scan: {{ navidrome_subsonic_scan_status.json['subsonic-response'].scanStatus.lastScan }}"
-      - "Web interface: {{ navidrome_web_interface.status }}"
+      - "Navidrome Subsonic API: {{ navidrome_subsonic_ping.json['subsonic-response'].status }}"
+      - "Navidrome music folders: {{ navidrome_subsonic_music_folders.json['subsonic-response'].musicFolders.musicFolder | length }}"
+      - "Navidrome last scan: {{ navidrome_subsonic_scan_status.json['subsonic-response'].scanStatus.lastScan }}"
+      - "Navidrome web interface: {{ navidrome_web_interface.status }}"
