@@ -36,7 +36,7 @@
 - name: Retrieve the Navidrome systemd service log for debugging
   when: navidrome_debug_service_enabled | bool
   ansible.builtin.command:
-    cmd: journalctl -xeu navidrome.service
+    cmd: journalctl --no-pager --output=cat --unit=navidrome.service
   changed_when: false
 
 # Navidrome's own liveness endpoint. It only tells us that the HTTP listener
