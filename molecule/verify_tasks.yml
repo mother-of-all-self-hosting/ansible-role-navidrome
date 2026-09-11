@@ -13,13 +13,14 @@
     file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
     name: navidrome_defaults
 
-- name: Wait for the Navidrome systemd service to become active (up to 180s)
+- name: Wait for the Navidrome systemd services to become active (up to 180s each)
   ansible.builtin.systemd_service:
-    name: navidrome.service
-  register: navidrome_service
-  until: navidrome_service.status.ActiveState == 'active'
+    name: "{{ item }}"
+  register: navidrome_services
+  until: navidrome_services.status.ActiveState == 'active'
   retries: 36
   delay: 5
+  loop: "{{ navidrome_verify_units }}"
   # So that giving up is reported by the assertion below rather than as a
   # wall of systemd unit properties.
   failed_when: false
@@ -27,17 +28,20 @@
 # `Restart=always` in the systemd unit means that even a container which crashes
 # and gets restarted reads as active here, so this is a precondition rather than
 # a result.
-- name: Assert the Navidrome systemd service is active
+- name: Assert the Navidrome systemd services are active
   ansible.builtin.assert:
-    that: navidrome_service.status.ActiveState == 'active'
-    fail_msg: "navidrome.service is not active ({{ navidrome_service.status.ActiveState }})"
-    success_msg: "navidrome.service is active"
+    that: navidrome_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
+    fail_msg: >-
+      Not every service is active:
+      {{ dict(navidrome_verify_units | zip(navidrome_services.results | map(attribute='status.ActiveState'))) }}
+    success_msg: "Every systemd service is active"
 
-- name: Retrieve the Navidrome systemd service log for debugging
+- name: Retrieve the Navidrome systemd services log for debugging
   when: navidrome_debug_service_enabled | bool
   ansible.builtin.command:
-    cmd: journalctl --no-pager --output=cat --unit=navidrome.service
+    cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
   changed_when: false
+  loop: "{{ navidrome_verify_units }}"
 
 # Navidrome's own liveness endpoint. It only tells us that the HTTP listener
 # is up - a Navidrome that has not been set up yet answers it just as
@@ -173,7 +177,7 @@
 - name: Show the Navidrome verification summary
   ansible.builtin.debug:
     msg:
-      - "Navidrome systemd: {{ navidrome_service.status.ActiveState }}"
+      - "Navidrome systemd: {% for unit, state in navidrome_verify_units | zip(navidrome_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
       - "Navidrome version: {{ navidrome_server_version }}"
       - "Navidrome Subsonic API: {{ navidrome_subsonic_ping.json['subsonic-response'].status }}"
       - "Navidrome music folders: {{ navidrome_subsonic_music_folders.json['subsonic-response'].musicFolders.musicFolder | length }}"

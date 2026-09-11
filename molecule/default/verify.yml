@@ -19,6 +19,9 @@
     navidrome_verify_subsonic_query: >-
       u={{ navidrome_verify_admin_username }}&p={{ navidrome_verify_admin_password }}&v=1.16.1&c=molecule&f=json
 
+    navidrome_verify_units:
+      - navidrome.service
+
   tasks:
     - name: Verify that Navidrome works
       block:
