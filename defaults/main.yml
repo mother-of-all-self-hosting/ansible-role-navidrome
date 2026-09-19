@@ -161,6 +161,12 @@ navidrome_container_extra_arguments: "{{ navidrome_container_extra_arguments_aut
 navidrome_container_extra_arguments_auto: []
 navidrome_container_extra_arguments_custom: []
 
+# A list of extra arguments to pass to the process inside the container
+# Example: ['--SOME_ARGUMENT']
+navidrome_process_extra_arguments: "{{ navidrome_process_extra_arguments_auto + navidrome_process_extra_arguments_custom }}"
+navidrome_process_extra_arguments_auto: []
+navidrome_process_extra_arguments_custom: []
+
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
 #
