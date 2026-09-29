@@ -18,11 +18,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Setting up Navidrome
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Navidrome](https://navidromebudget.org) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Navidrome](https://www.navidrome.org/) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Navidrome is a local-first personal finance tool.
+Navidrome is a [Subsonic-API](http://www.subsonic.org/pages/api.jsp) compatible music server.
 
-See the project's [documentation](https://navidromebudget.org/docs/) to learn what Navidrome does and why it might be useful to you.
+See the project's [documentation](https://www.navidrome.org/docs/) to learn what Navidrome does and why it might be useful to you.
 
 ## Adjusting the playbook configuration
 
@@ -56,8 +56,6 @@ navidrome_hostname: "example.com"
 
 After adjusting the hostname, make sure to adjust your DNS records to point the domain to your server.
 
-**Note**: hosting Navidrome under a subpath (by configuring the `navidrome_path_prefix` variable) does not seem to be possible due to Navidrome's technical limitations.
-
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the service.
@@ -78,7 +76,11 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 ## Usage
 
-After running the command for installation, Navidrome becomes available at the specified hostname like `https://example.com`. To use it, open the URL on the browser and create an account.
+After running the command for installation, Navidrome becomes available at the specified hostname like `https://example.com`.
+
+To get started, open the URL with a web browser to create an administrator account. You can create additional users (admin-privileged or not) after that.
+
+You can also connect various Subsonic-API-compatible [apps](https://www.navidrome.org/docs/overview/#apps) (desktop, web, mobile) to your Navidrome instance.
 
 ## Troubleshooting
 
