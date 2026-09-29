@@ -74,6 +74,12 @@ navidrome_environment_variable_nd_scanner_schedule: SCHEDULE_VALUE_HERE
 
 The Golang cron syntax is accepted. Refer to [this page](https://pkg.go.dev/github.com/robfig/cron) for details.
 
+### Integrating with Prometheus (optional)
+
+Etherpad can natively expose metrics to Prometheus.
+
+If you are looking for an integration, you can check out the MASH playbook. Refer to [this section of the documentation on the playbook](https://github.com/mother-of-all-self-hosting/mash-playbook/blob/main/docs/services/navidrome.md#integrating-with-prometheus-optional) for more information.
+
 ### Extending the configuration
 
 There are some additional things you may wish to configure about the service.
