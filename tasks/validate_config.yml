@@ -26,9 +26,6 @@
   with_items:
     - navidrome_uid
     - navidrome_gid
-    - navidrome_hostname
-    - navidrome_path_prefix
-    - navidrome_container_network
 
 - name: Fail if Navidrome logging level is invalid
   ansible.builtin.fail:
