@@ -47,7 +47,7 @@
       failed_when: false
 
     - name: Ensure Navidrome container network does not exist
-      when: navidrome_container_network_deletion_enabled
+      when: navidrome_container_network_deletion_enabled and navidrome_container_network != 'host'
       block:
         - name: Ensure Navidrome container network does not exist via community.docker.docker_network
           when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
